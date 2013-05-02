@@ -14,7 +14,7 @@ module Futuroscope
     it "will execute the future in the background and wait for it" do
       future = Future.new{ sleep(0.1); :edballs }
 
-      Timeout::timeout(0.15) do
+      Timeout::timeout(0.18) do
         sleep(0.1)
         expect(future.to_sym).to eq(:edballs)
       end
