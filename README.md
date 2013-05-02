@@ -56,6 +56,7 @@ z = future{ sleep(1); 3 }
 
 puts x + y + z
 => 6
+```
 
 ## Contributing
 
