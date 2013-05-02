@@ -1,4 +1,8 @@
 # Futuroscope
+[![Gem Version](https://badge.fury.io/rb/futuroscope.png)](http://badge.fury.io/rb/futuroscope)
+[![Build Status](https://travis-ci.org/codegram/futuroscope.png?branch=master)](https://travis-ci.org/codegram/futuroscope)
+[![Dependency Status](https://gemnasium.com/codegram/futuroscope.png)](https://gemnasium.com/codegram/futuroscope)
+[![Coverage Status](https://coveralls.io/repos/codegram/futuroscope/badge.png?branch=master)](https://coveralls.io/r/codegram/futuroscope)
 
 Futursocope is a simple library that implements futures in ruby. Futures are a
 concurrency pattern meant to help you deal with concurrency in a simple way.
