@@ -18,6 +18,8 @@ method on in it will be forwarded to the block's return value.
 If the thread didn't finish yet, it will block the program's execution until
 it's finished. Otherwise, it will immediataly return its value.
 
+Futuroscope is tested on `MRI 1.9.3`, `MRI 2.0.0`, `JRuby` and `Rubinius`.
+
 ## Installation
 
 Add this line to your application's Gemfile:
