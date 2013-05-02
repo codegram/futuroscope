@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Futuroscope::VERSION
   spec.authors       = ["Josep Jaume Rey Peroy"]
   spec.email         = ["josepjaume@gmail.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.description   = %q{Futuroscope is yet another simple gem that implements the Futures concurrency pattern.}
+  spec.summary = %q{Futuroscope is yet another simple gem that implements the Futures concurrency pattern.}
   spec.homepage      = ""
   spec.license       = "MIT"
 
