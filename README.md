@@ -69,6 +69,10 @@ puts x + y + z
 => 6
 ```
 
+## Ideas for the future
+
+* Having a thread pool so you can limit maximum concurrency.
+
 ## Contributing
 
 1. Fork it
