@@ -74,8 +74,7 @@ puts map[1]
 puts map.last
 => 4
 
-### This action will actually only take 1 second.
-
+# This action will actually only take 1 second.
 ```
 
 ### Convenience methods
