@@ -104,6 +104,19 @@ items = [1, 2, 3].future_map do |i|
 end
 ```
 
+## Considerations
+
+You should never add **side-effects** to a future. They have to be thought of 
+like they were a local variable, with the only outcome that they're returning a 
+value. 
+
+You have to take into account that they really run in a different thread, so
+you'll be potentially accessing code in parallel that could not be threadsafe.
+
+If you're looking for other ways to improve your code performance via
+concurrency, you should probably deal directly with [Ruby's
+threads](http://ruby-doc.org/core-2.0/Thread.html).
+
 ## Ideas for the future
 
 * Having a thread pool so you can limit maximum concurrency.
