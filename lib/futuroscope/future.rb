@@ -5,7 +5,7 @@ module Futuroscope
   # and will return it instantly if the thread's execution already finished.
   #
   class Future
-    attr_writer :__value
+    attr_writer :future_value
     extend Forwardable
 
     # Initializes a future with a block and starts its execution.
@@ -27,7 +27,7 @@ module Futuroscope
 
       @thread = Thread.new do
         result = block.call
-        self.__value = result
+        self.future_value = result
       end
     end
 
@@ -35,29 +35,29 @@ module Futuroscope
     # completed or return its value otherwise. Can be called multiple times.
     #
     # Returns the Future's block execution result.
-    def __value
+    def future_value
       @mutex.synchronize do
-        return @__value if defined?(@__value)
+        return @future_value if defined?(@future_value)
       end
       @thread.join
-      @__value
+      @future_value
     end
 
-    def_delegators :__value, :to_s, :==, :kind_of?, :is_a?, :clone, :class
+    def_delegators :future_value, :to_s, :==, :kind_of?, :is_a?, :clone, :class
 
     private
 
     def method_missing(method, *args)
-      __value.send(method, *args)
+      future_value.send(method, *args)
     end
 
     def respond_to_missing?(method, include_private = false)
-      __value.respond_to?(method, include_private)
+      future_value.respond_to?(method, include_private)
     end
 
-    def __value=(value)
+    def future_value=(value)
       @mutex.synchronize do
-        @__value = value
+        @future_value = value
       end
     end
   end
