@@ -25,15 +25,5 @@ module Futuroscope
         end
       end
     end
-
-    private
-
-    def method_missing(method, *args)
-      @map.send(method, *args)
-    end
-
-    def respond_to_missing?(method, include_private = false)
-      @map.respond_to?(method, include_private)
-    end
   end
 end
