@@ -43,7 +43,8 @@ module Futuroscope
       @future_value
     end
 
-    def_delegators :future_value, :to_s, :==, :kind_of?, :is_a?, :clone, :class
+    def_delegators :future_value, 
+      :to_s, :==, :kind_of?, :is_a?, :clone, :class, :inspect
 
     private
 
