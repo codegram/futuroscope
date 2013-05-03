@@ -44,7 +44,8 @@ module Futuroscope
     end
 
     def_delegators :future_value, 
-      :to_s, :==, :kind_of?, :is_a?, :clone, :class, :inspect
+      :to_s, :==, :kind_of?, :is_a?, :clone, :class, :inspect, :tap, :to_enum,
+      :display, :eql?, :hash, :methods, :nil?
 
     private
 
