@@ -1,6 +1,12 @@
 module Futuroscope
+  # A Future is an object that gets initialized with a block and will behave
+  # exactly like the block's result, but being able to "borrow" its result from
+  # the future. That is, will block when the result is not ready until it is,
+  # and will return it instantly if the thread's execution already finished.
+  #
   class Future
     attr_writer :__value
+    extend Forwardable
 
     # Initializes a future with a block and starts its execution.
     #
@@ -36,6 +42,8 @@ module Futuroscope
       @thread.join
       @__value
     end
+
+    def_delegators :__value, :to_s, :==
 
     private
 
