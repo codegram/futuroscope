@@ -41,6 +41,7 @@ Or install it yourself as:
 
 ## Usage
 
+### Simple futures
 ```Ruby
 require 'futuroscope'
 
@@ -55,6 +56,30 @@ puts x + y + z
 => 6
 ```
 
+### Future map
+```Ruby
+require 'futuroscope'
+
+map = Futuroscope::Map.new([1, 2, 3]).map do |i|
+  sleep(1)
+  i + 1
+end
+
+puts map.first
+=> 2
+
+puts map[1]
+=> 3
+
+puts map.last
+=> 4
+
+### This action will actually only take 1 second.
+
+```
+
+### Convenience methods
+
 If you don't mind polluting the `Kernel` module, you can also require
 futuroscope's convenience `future` method:
 
@@ -67,6 +92,17 @@ z = future{ sleep(1); 3 }
 
 puts x + y + z
 => 6
+```
+
+Same for a map:
+
+```Ruby
+require 'futuroscope/convenience'
+
+items = [1, 2, 3].future_map do |i|
+  sleep(i)
+  i + 1
+end
 ```
 
 ## Ideas for the future
