@@ -56,6 +56,17 @@ puts x + y + z
 => 6
 ```
 
+Since a `future` is actually delegating everything to the future's value, there
+might be some cases where you want to get the actual future's value. You can do
+it just by calling the `future_value` method on the future:
+
+```Ruby
+string = "Ed Balls"
+x = future{ string }
+x.future_value === string
+# => true
+```
+
 ### Future map
 ```Ruby
 require 'futuroscope'
