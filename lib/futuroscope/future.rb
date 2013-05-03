@@ -14,7 +14,7 @@ module Futuroscope
     #
     #   future = Futuroscope::Future.new { sleep(1); :edballs }
     #   sleep(1)
-    #   future.value 
+    #   puts future
     #   => :edballs
     #   # This will return in 1 second and not 2 if the execution wasn't
     #   # deferred to a thread.
