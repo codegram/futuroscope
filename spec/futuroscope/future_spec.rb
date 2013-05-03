@@ -20,7 +20,7 @@ module Futuroscope
       end
     end
 
-    it "delegates some important methods to the original object's" do
+    it "delegates some Object methods to the original object's" do
       object = [1, 2, 3]
       future = Future.new{object}
 
@@ -29,6 +29,12 @@ module Futuroscope
       expect(future).to be_a(Enumerable)
       expect(future.clone).to eq(object)
       expect(future.to_s).to eq(object.to_s)
+    end
+
+    it "delegates missing methods" do
+      object = [1, 2, 3]
+      future = Future.new{object}
+      expect(future).to_not be_empty
     end
   end
 end
