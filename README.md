@@ -128,9 +128,32 @@ If you're looking for other ways to improve your code performance via
 concurrency, you should probably deal directly with [Ruby's
 threads](http://ruby-doc.org/core-2.0/Thread.html).
 
-## Ideas for the future
+## Thread pool
 
-* Having a thread pool so you can limit maximum concurrency.
+Futures are scheduled in a thread pool that helps managing concurrency in a way
+that doesn't get out of hands. Also comes with great benefits since their
+threads are spawned at load time (and not in runtime).
+
+The default thread pool comes with a concurrency of 8 threads, which seems
+reasonable for the most use cases.
+
+The default thread pool can be replaced by a new pool with different 
+concurrency like this:
+
+```Ruby
+Futuroscope.default_pool = Futuroscope::Pool.new(24)
+```
+
+Also, each future can be scheduled to a different pool like this:
+
+```Ruby
+pool = Futuroscope::Pool.new(32)
+
+future = Future.new(pool){ :edballs }
+
+# Or with the convenience method
+future = future(pool){ :edballs }
+```
 
 ## Contributing
 
