@@ -19,19 +19,21 @@ module Futuroscope
     #   # This will return in 1 second and not 2 if the execution wasn't
     #   # deferred to a thread.
     #
+    # pool  - A pool where all the futures will be scheduled.
     # block - A block that will be run in the background.
     #
     # Returns a Future
-    def initialize(&block)
+    def initialize(pool = Futuroscope.default_pool, &block)
       @mutex = Mutex.new
       @queue = Queue.new
-      @pool = Futuroscope.default_pool
+      @pool = pool
+      @block = block
+      @pool.queue self
+    end
 
-      @thread = @pool.queue do
-        result = block.call
-        self.future_value = result
-        @queue.push :ok
-      end
+    def run_future
+      self.future_value = @block.call
+      @queue.push :ok
     end
 
     # Semipublic: Returns the future's value. Will wait for the future to be 
