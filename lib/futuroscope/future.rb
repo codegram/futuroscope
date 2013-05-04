@@ -24,10 +24,13 @@ module Futuroscope
     # Returns a Future
     def initialize(&block)
       @mutex = Mutex.new
+      @queue = Queue.new
+      @pool = Futuroscope.default_pool
 
-      @thread = Thread.new do
+      @thread = @pool.queue do
         result = block.call
         self.future_value = result
+        @queue.push :ok
       end
     end
 
@@ -39,7 +42,7 @@ module Futuroscope
       @mutex.synchronize do
         return @future_value if defined?(@future_value)
       end
-      @thread.join
+      @queue.pop
       @future_value
     end
 
