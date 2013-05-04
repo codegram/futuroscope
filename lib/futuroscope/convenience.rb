@@ -2,8 +2,8 @@ require 'futuroscope/future'
 require 'futuroscope/map'
 
 module Kernel
-  def future(&block)
-    Futuroscope::Future.new(&block)
+  def future(pool = Futuroscope.default_pool, &block)
+    Futuroscope::Future.new(pool, &block)
   end
 end
 
