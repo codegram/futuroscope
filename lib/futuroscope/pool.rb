@@ -36,7 +36,9 @@ module Futuroscope
     #
     # Returns a Future
     def pop
-      return nil if @queue.empty? && more_workers_than_needed?
+      @mutex.synchronize do
+        return nil if @queue.empty? && more_workers_than_needed?
+      end
       return @queue.pop
     end
 
