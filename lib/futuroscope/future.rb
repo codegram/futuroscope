@@ -31,14 +31,12 @@ module Futuroscope
     end
 
     def run_future
-      @mutex.synchronize do
-        begin
-          @future_value = @block.call
-        rescue Exception => e
-          @exception = e
-        end
-        @condition.signal
+      begin
+        @future_value = @block.call
+      rescue Exception => e
+        @exception = e
       end
+      @condition.signal
     end
 
     # Semipublic: Returns the future's value. Will wait for the future to be 
@@ -47,11 +45,11 @@ module Futuroscope
     # Returns the Future's block execution result.
     def future_value
       @mutex.synchronize do
-        return @future_value if defined?(@future_value)
-        @condition.wait(@mutex)
+        begin
+          raise @exception if @exception
+          return @future_value if defined?(@future_value)
+        end while @condition.wait(@mutex)
       end
-      raise @exception if @exception
-      @future_value
     end
 
     def_delegators :future_value, 
