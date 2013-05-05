@@ -5,7 +5,6 @@ module Futuroscope
   # and will return it instantly if the thread's execution already finished.
   #
   class Future
-    attr_writer :future_value
     extend Forwardable
 
     # Initializes a future with a block and starts its execution.
@@ -32,12 +31,14 @@ module Futuroscope
     end
 
     def run_future
-      begin
-        self.future_value = @block.call
-      rescue Exception => e
-        @exception = e
+      @mutex.synchronize do
+        begin
+          @future_value = @block.call
+        rescue Exception => e
+          @exception = e
+        end
+        @condition.signal
       end
-      @condition.signal
     end
 
     # Semipublic: Returns the future's value. Will wait for the future to be 
@@ -65,12 +66,6 @@ module Futuroscope
 
     def respond_to_missing?(method, include_private = false)
       future_value.respond_to?(method, include_private)
-    end
-
-    def future_value=(value)
-      @mutex.synchronize do
-        @future_value = value
-      end
     end
   end
 end
