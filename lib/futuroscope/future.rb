@@ -25,7 +25,7 @@ module Futuroscope
     # Returns a Future
     def initialize(pool = Futuroscope.default_pool, &block)
       @mutex = Mutex.new
-      @queue = Queue.new
+      @condition = ConditionVariable.new
       @pool = pool
       @block = block
       @pool.queue self
@@ -33,7 +33,7 @@ module Futuroscope
 
     def run_future
       self.future_value = @block.call
-      @queue.push :ok
+      @condition.signal
     end
 
     # Semipublic: Returns the future's value. Will wait for the future to be 
@@ -43,8 +43,8 @@ module Futuroscope
     def future_value
       @mutex.synchronize do
         return @future_value if defined?(@future_value)
+        @condition.wait(@mutex)
       end
-      @queue.pop
       @future_value
     end
 
