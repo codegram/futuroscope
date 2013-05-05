@@ -24,7 +24,7 @@ module Futuroscope
     # Returns a Future
     def initialize(pool = Futuroscope.default_pool, &block)
       @mutex = Mutex.new
-      @condition = ConditionVariable.new
+      @queue = Queue.new
       @pool = pool
       @block = block
       @pool.queue self
@@ -36,7 +36,7 @@ module Futuroscope
       rescue Exception => e
         @exception = e
       end
-      @condition.signal
+      @queue.push :ok
     end
 
     # Semipublic: Returns the future's value. Will wait for the future to be 
@@ -48,7 +48,7 @@ module Futuroscope
         begin
           raise @exception if @exception
           return @future_value if defined?(@future_value)
-        end while @condition.wait(@mutex)
+        end while @queue.pop
       end
     end
 
