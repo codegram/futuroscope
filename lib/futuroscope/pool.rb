@@ -14,11 +14,9 @@ module Futuroscope
     def initialize(min_workers = 8, max_workers = 16)
       @min_workers = min_workers
       @max_workers = max_workers
-      @mutex = Mutex.new
       @queue = Queue.new
       @workers = Set.new
-      @worker_mutex = Mutex.new
-      @queue_mutex = Mutex.new
+      @mutex = Mutex.new
       warm_up_workers
     end
 
@@ -26,7 +24,7 @@ module Futuroscope
     #
     # future - The Future to enqueue.
     def queue(future)
-      @worker_mutex.synchronize do
+      @mutex.synchronize do
         spin_worker if can_spin_extra_workers?
         @queue.push future
       end
@@ -46,7 +44,7 @@ module Futuroscope
     #
     # worker - A Worker
     def worker_died(worker)
-      @worker_mutex.synchronize do
+      @mutex.synchronize do
         @workers.delete(worker)
       end
     end
@@ -54,7 +52,7 @@ module Futuroscope
     private
 
     def warm_up_workers
-      @worker_mutex.synchronize do
+      @mutex.synchronize do
         while(@workers.length < @min_workers) do
           spin_worker
         end
