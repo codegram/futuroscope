@@ -32,7 +32,11 @@ module Futuroscope
     end
 
     def run_future
-      self.future_value = @block.call
+      begin
+        self.future_value = @block.call
+      rescue Exception => e
+        @exception = e
+      end
       @condition.signal
     end
 
@@ -45,6 +49,7 @@ module Futuroscope
         return @future_value if defined?(@future_value)
         @condition.wait(@mutex)
       end
+      raise @exception if @exception
       @future_value
     end
 

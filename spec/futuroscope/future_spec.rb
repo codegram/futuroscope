@@ -36,5 +36,13 @@ module Futuroscope
       future = Future.new{object}
       expect(future).to_not be_empty
     end
+
+    it "captures exceptions and re-raises them when calling the value" do
+      future = Future.new{ raise "Ed Balls" }
+
+      expect(lambda{
+        future.inspect
+      }).to raise_error(Exception)
+    end
   end
 end
