@@ -29,11 +29,29 @@ module Futuroscope
           Future.new(pool){ sleep(1) }
         end
 
-        sleep(0.1)
+        sleep(0.5)
         expect(pool.workers).to have(8).workers
 
         sleep(1.5)
         expect(pool.workers).to have(2).workers
+      end
+
+      it "allows overriding min workers real time" do
+        pool = Pool.new(2, 8)
+        pool.min_workers = 3
+        expect(pool.workers).to have(3).workers
+      end
+
+      it "allows overriding max workers real time" do
+        pool = Pool.new(2, 8)
+        pool.max_workers = 4
+
+        10.times do |future|
+          Future.new(pool){ sleep(1) }
+        end
+
+        sleep(0.5)
+        expect(pool.workers).to have(4).workers
       end
     end
   end

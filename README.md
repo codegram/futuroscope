@@ -138,11 +138,11 @@ The default thread pool comes with a concurrency of 8 Workers, which seems
 reasonable for the most use cases. It will elastically expand to the default of
 16 threads and will kill them when they're not needed.
 
-The default thread pool can be replaced by a new pool with different 
-concurrency like this:
+The default thread pool can be configured like this:
 
 ```Ruby
-Futuroscope.default_pool = Futuroscope::Pool.new(min_threads, max_threads)
+Futuroscope.default_pool.min_workers = 2
+Futuroscope.default_pool.max_workers = 16
 ```
 
 Also, each future can be scheduled to a different pool like this:

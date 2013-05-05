@@ -7,6 +7,7 @@ module Futuroscope
   # have to spin them up each time a future is created.
   class Pool
     attr_reader :workers
+    attr_accessor :min_workers, :max_workers
 
     # Public: Initializes a new Pool.
     #
@@ -47,6 +48,11 @@ module Futuroscope
       @mutex.synchronize do
         @workers.delete(worker)
       end
+    end
+
+    def min_workers=(count)
+      @min_workers = count
+      warm_up_workers
     end
 
     private
