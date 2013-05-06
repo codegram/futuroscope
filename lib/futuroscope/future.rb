@@ -6,7 +6,7 @@ module Futuroscope
   # the future. That is, will block when the result is not ready until it is,
   # and will return it instantly if the thread's execution already finished.
   #
-  class Future < BasicObject
+  class Future < Delegator
     extend ::Forwardable
 
     # Initializes a future with a block and starts its execution.
@@ -42,27 +42,19 @@ module Futuroscope
     # completed or return its value otherwise. Can be called multiple times.
     #
     # Returns the Future's block execution result.
-    def future_value
+    def __getobj__
       resolved = resolved_future_value
 
       raise resolved[:exception] if resolved[:exception]
       resolved[:value]
     end
 
-    def_delegators :future_value, :!, :!=, :==, :equal?
+    def_delegators :__getobj__, :class, :kind_of?, :is_a?, :clone
 
     private
 
     def resolved_future_value
       @resolved_future ||= @queue.pop
-    end
-
-    def method_missing(method, *args)
-      future_value.send(method, *args)
-    end
-
-    def respond_to_missing?(method, include_private = false)
-      future_value.respond_to?(method, include_private)
     end
   end
 end
