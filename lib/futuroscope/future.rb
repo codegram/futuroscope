@@ -23,20 +23,17 @@ module Futuroscope
     #
     # Returns a Future
     def initialize(pool = Futuroscope.default_pool, &block)
-      @mutex = Mutex.new
-      @queue = Queue.new
+      @queue = SizedQueue.new(1)
       @pool = pool
       @block = block
       @pool.queue self
     end
 
+    # Semipublic: Forces this future to be run.
     def run_future
-      begin
-        @future_value = @block.call
-      rescue Exception => e
-        @exception = e
-      end
-      @queue.push :ok
+      @queue.push(value: @block.call)
+    rescue Exception => e
+      @queue.push(exception: e)
     end
 
     # Semipublic: Returns the future's value. Will wait for the future to be 
@@ -44,12 +41,10 @@ module Futuroscope
     #
     # Returns the Future's block execution result.
     def future_value
-      @mutex.synchronize do
-        begin
-          raise @exception if @exception
-          return @future_value if defined?(@future_value)
-        end while @queue.pop
-      end
+      resolved = resolved_future_value
+
+      raise resolved[:exception] if resolved[:exception]
+      resolved[:value]
     end
 
     def_delegators :future_value, 
@@ -57,6 +52,10 @@ module Futuroscope
       :display, :eql?, :hash, :methods, :nil?
 
     private
+
+    def resolved_future_value
+      @resolved_future ||= @queue.pop
+    end
 
     def method_missing(method, *args)
       future_value.send(method, *args)
