@@ -54,5 +54,15 @@ module Futuroscope
         expect(pool.workers).to have(4).workers
       end
     end
+
+    describe "#finalize" do
+      it "shuts down all its workers" do
+        pool = Pool.new(2, 8)
+
+        pool.send(:finalize)
+        
+        expect(pool.workers).to have(0).workers
+      end
+    end
   end
 end
