@@ -25,6 +25,7 @@ module Futuroscope
     describe "worker control" do
       it "adds more workers when needed and returns to the default amount" do
         pool = Pool.new(2, 8)
+        pool.stub(:span_chance).and_return true
         10.times do |future|
           Future.new(pool){ sleep(1) }
         end
@@ -44,6 +45,7 @@ module Futuroscope
 
       it "allows overriding max workers real time" do
         pool = Pool.new(2, 8)
+        pool.stub(:span_chance).and_return true
         pool.max_workers = 4
 
         10.times do |future|
@@ -62,6 +64,15 @@ module Futuroscope
         pool.send(:finalize)
         
         expect(pool.workers).to have(0).workers
+      end
+    end
+
+    describe "#span_chance" do
+      it "returns true or false randomly" do
+        pool = Pool.new
+        chance = pool.send(:span_chance)
+
+        expect([true, false]).to include(chance)
       end
     end
   end

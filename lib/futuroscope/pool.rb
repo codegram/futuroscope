@@ -68,7 +68,11 @@ module Futuroscope
     end
 
     def can_spin_extra_workers?
-      @workers.length < @max_workers
+      @workers.length < @max_workers && span_chance
+    end
+
+    def span_chance
+      [true, false].sample
     end
 
     def more_workers_than_needed?
