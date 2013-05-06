@@ -47,9 +47,7 @@ module Futuroscope
       resolved[:value]
     end
 
-    def_delegators :future_value, 
-      :to_s, :==, :kind_of?, :is_a?, :clone, :class, :inspect, :tap, :to_enum,
-      :display, :eql?, :hash, :methods, :nil?
+    def_delegators :future_value, *Object.instance_methods
 
     private
 
