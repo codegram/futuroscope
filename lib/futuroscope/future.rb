@@ -49,7 +49,7 @@ module Futuroscope
       resolved[:value]
     end
 
-    def_delegators :future_value, *::BasicObject.instance_methods
+    def_delegators :future_value, :!, :!=, :==, :equal?
 
     private
 
