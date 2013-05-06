@@ -19,12 +19,19 @@ module Futuroscope
         while(future = @pool.pop) do
           future.run_future
         end
-        stop
+        die
       end
     end
 
     # Public: Stops this worker.
     def stop
+      @thread.kill
+      die
+    end
+
+    private
+
+    def die
       @pool.worker_died(self)
     end
   end
