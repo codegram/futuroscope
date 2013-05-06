@@ -23,7 +23,7 @@ method on in it will be forwarded to the block's return value.
 If the thread didn't finish yet, it will block the program's execution until
 it's finished. Otherwise, it will immediataly return its value.
 
-Futuroscope is tested on `MRI 1.9.3`, `MRI 2.0.0`, `MRI 1.8.7`, `JRuby in 1.9 mode`, `JRuby in 1.8 mode`, `Rubinius 1.9 mode`, `Rubinius 1.8 mode` and `REE`.
+Futuroscope is tested on `MRI 1.9.3`, `MRI 2.0.0`, `Rubinius (1.9)` and `JRuby (1.9)`.
 
 ## Installation
 
