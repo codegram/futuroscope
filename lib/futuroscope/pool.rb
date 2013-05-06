@@ -72,7 +72,8 @@ module Futuroscope
     end
 
     def span_chance
-      [true, false].sample
+      values = [true, false]
+      values.respond_to?(:sample) ? values.sample : values.choice
     end
 
     def more_workers_than_needed?
