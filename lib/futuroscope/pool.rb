@@ -12,9 +12,9 @@ module Futuroscope
     # Public: Initializes a new Pool.
     #
     # thread_count - The number of workers that this pool is gonna have
-    def initialize(min_workers = 8, max_workers = 16)
-      @min_workers = min_workers
-      @max_workers = max_workers
+    def initialize(range = 8..16)
+      @min_workers = range.min
+      @max_workers = range.max
       @queue = Queue.new
       @workers = Set.new
       @mutex = Mutex.new

@@ -4,10 +4,10 @@ require 'futuroscope/pool'
 module Futuroscope
   describe Pool do
     it "spins up a number of workers" do
-      pool = Pool.new(2)
+      pool = Pool.new(2..4)
       expect(pool.workers).to have(2).workers
 
-      pool = Pool.new(3)
+      pool = Pool.new(3..4)
       expect(pool.workers).to have(3).workers
     end
 
@@ -24,7 +24,7 @@ module Futuroscope
 
     describe "worker control" do
       it "adds more workers when needed and returns to the default amount" do
-        pool = Pool.new(2, 8)
+        pool = Pool.new(2..8)
         pool.stub(:span_chance).and_return true
         10.times do |future|
           Future.new(pool){ sleep(1) }
@@ -38,13 +38,13 @@ module Futuroscope
       end
 
       it "allows overriding min workers real time" do
-        pool = Pool.new(2, 8)
+        pool = Pool.new(2..8)
         pool.min_workers = 3
         expect(pool.workers).to have(3).workers
       end
 
       it "allows overriding max workers real time" do
-        pool = Pool.new(2, 8)
+        pool = Pool.new(2..8)
         pool.stub(:span_chance).and_return true
         pool.max_workers = 4
 
@@ -59,10 +59,10 @@ module Futuroscope
 
     describe "#finalize" do
       it "shuts down all its workers" do
-        pool = Pool.new(2, 8)
+        pool = Pool.new(2..8)
 
         pool.send(:finalize)
-        
+
         expect(pool.workers).to have(0).workers
       end
     end
