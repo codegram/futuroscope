@@ -1,11 +1,13 @@
+require 'thread'
+
 module Futuroscope
   # A Future is an object that gets initialized with a block and will behave
   # exactly like the block's result, but being able to "borrow" its result from
   # the future. That is, will block when the result is not ready until it is,
   # and will return it instantly if the thread's execution already finished.
   #
-  class Future
-    extend Forwardable
+  class Future < BasicObject
+    extend ::Forwardable
 
     # Initializes a future with a block and starts its execution.
     #
@@ -22,8 +24,8 @@ module Futuroscope
     # block - A block that will be run in the background.
     #
     # Returns a Future
-    def initialize(pool = Futuroscope.default_pool, &block)
-      @queue = SizedQueue.new(1)
+    def initialize(pool = ::Futuroscope.default_pool, &block)
+      @queue = ::SizedQueue.new(1)
       @pool = pool
       @block = block
       @pool.queue self
@@ -32,7 +34,7 @@ module Futuroscope
     # Semipublic: Forces this future to be run.
     def run_future
       @queue.push(:value => @block.call)
-    rescue Exception => e
+    rescue ::Exception => e
       @queue.push(:exception => e)
     end
 
@@ -47,7 +49,7 @@ module Futuroscope
       resolved[:value]
     end
 
-    def_delegators :future_value, *Object.instance_methods
+    def_delegators :future_value, *::BasicObject.instance_methods
 
     private
 
