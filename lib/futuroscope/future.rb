@@ -31,9 +31,9 @@ module Futuroscope
 
     # Semipublic: Forces this future to be run.
     def run_future
-      @queue.push(value: @block.call)
+      @queue.push(:value => @block.call)
     rescue Exception => e
-      @queue.push(exception: e)
+      @queue.push(:exception => e)
     end
 
     # Semipublic: Returns the future's value. Will wait for the future to be 
