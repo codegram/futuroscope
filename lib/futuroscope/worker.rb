@@ -23,8 +23,7 @@ module Futuroscope
       end
     end
 
-    private
-
+    # Public: Stops this worker.
     def stop
       @pool.worker_died(self)
     end
