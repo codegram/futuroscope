@@ -25,6 +25,8 @@ it's finished. Otherwise, it will immediataly return its value.
 
 Futuroscope is tested on `MRI 1.9.3`, `MRI 2.0.0`, `Rubinius (1.9)` and `JRuby (1.9)`.
 
+Check out [futuroscope's post on Codegram's blog](http://blog.codegram.com/2013/5/new-gem-released-futuroscope) to get started.
+
 ## Installation
 
 Add this line to your application's Gemfile:
