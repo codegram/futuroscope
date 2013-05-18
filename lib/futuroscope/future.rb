@@ -1,5 +1,6 @@
 require 'thread'
 require 'delegate'
+require 'forwardable'
 
 module Futuroscope
   # A Future is an object that gets initialized with a block and will behave
