@@ -44,5 +44,12 @@ module Futuroscope
         future.inspect
       }).to raise_error(Exception)
     end
+
+    it "returns the original object when future_value gets called" do
+      object = mock()
+      future = Future.new{ object }
+
+      expect(future.future_value.object_id === object.object_id).to eq(true)
+    end
   end
 end

@@ -53,6 +53,8 @@ module Futuroscope
 
     def_delegators :__getobj__, :class, :kind_of?, :is_a?, :clone
 
+    alias_method :future_value, :__getobj__
+
     private
 
     def resolved_future_value
