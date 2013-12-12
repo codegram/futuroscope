@@ -51,5 +51,13 @@ module Futuroscope
 
       expect(future.future_value.object_id === object.object_id).to eq(true)
     end
+
+    it "marshals a future object by serializing the result value" do
+      object = [1, 2, 3]
+      future = Future.new{object}
+      dumped = Marshal.dump(future)
+      expect(Marshal.load(dumped).future_value).to eq(object)
+    end
+
   end
 end
