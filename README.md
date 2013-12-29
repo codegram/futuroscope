@@ -17,14 +17,14 @@ You can learn more about futures here in this excellent article from @jpignata:
 [Concurrency Patterns in Ruby:
 Futures](http://tx.pignata.com/2012/11/concurrency-patterns-in-ruby-futures.html)
 
-In Futuroscope, futures are instantiated with a simple ruby block. The future's 
+In Futuroscope, futures are instantiated with a simple ruby block. The future's
 execution will immediately start in a different thread and when you call a
 method on in it will be forwarded to the block's return value.
 
 If the thread didn't finish yet, it will block the program's execution until
 it's finished. Otherwise, it will immediately return its value.
 
-Futuroscope is tested on `MRI 1.9.3`, `MRI 2.0.0`, `Rubinius (1.9)` and `JRuby (1.9)`.
+Futuroscope is tested on `MRI 1.9.3`, `MRI 2.0.0`, `MRI 2.1.0`, `Rubinius (1.9)` and `JRuby (1.9)`.
 
 Check out [futuroscope's post on Codegram's blog](http://blog.codegram.com/2013/5/new-gem-released-futuroscope) to get started.
 
@@ -120,9 +120,9 @@ end
 
 ## Considerations
 
-You should never add **side-effects** to a future. They have to be thought of 
-like they were a local variable, with the only outcome that they're returning a 
-value. 
+You should never add **side-effects** to a future. They have to be thought of
+like they were a local variable, with the only outcome that they're returning a
+value.
 
 You have to take into account that they really run in a different thread, so
 you'll be potentially accessing code in parallel that could not be thread-safe.
