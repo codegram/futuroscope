@@ -22,5 +22,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "rspec-mocks"
-  spec.add_runtime_dependency 'rubysl' if spec.platform == 'rubinius'
+  spec.add_runtime_dependency 'rubysl' if RUBY_ENGINE == 'rbx'
 end
