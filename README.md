@@ -8,8 +8,12 @@
 Futursocope is a simple library that implements futures in ruby. Futures are a
 concurrency pattern meant to help you deal with threads in a simple, transparent way.
 
-It's specially useful when working in Service Oriented Architectures where HTTP
-calls can take a long time and you only expect a value from them.
+It's specially useful in situations where you have calls to an expensive resource that
+could be done in parallel (they are not chained), but you don't wanna deal with low-level
+threads. HTTP calls are a good example.
+
+Also useful when you want to spin up a process that runs in the background, do some stuff 
+in the middle, and wait for that process to return.
 
 [![The awesome Futuroscope park](http://europe.eurostar.com/wp-content/uploads/2011/06/Futuroscope10-59-of-107.jpg)](http://futuroscope.com)
 
