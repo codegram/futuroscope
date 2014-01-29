@@ -6,7 +6,7 @@
 [![Dependency Status](https://gemnasium.com/codegram/futuroscope.png)](https://gemnasium.com/codegram/futuroscope)
 
 Futursocope is a simple library that implements futures in ruby. Futures are a
-concurrency pattern meant to help you deal with concurrency in a simple way.
+concurrency pattern meant to help you deal with threads in a simple, transparent way.
 
 It's specially useful when working in Service Oriented Architectures where HTTP
 calls can take a long time and you only expect a value from them.
