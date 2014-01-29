@@ -46,7 +46,7 @@ module Futuroscope
     end
 
     it "returns the original object when future_value gets called" do
-      object = mock()
+      object = double
       future = Future.new{ object }
 
       expect(future.future_value.object_id === object.object_id).to eq(true)
@@ -57,6 +57,13 @@ module Futuroscope
       future = Future.new{object}
       dumped = Marshal.dump(future)
       expect(Marshal.load(dumped).future_value).to eq(object)
+    end
+
+    it "correctly duplicates a future object" do
+      object = [1, 2, 3]
+      future = Future.new { object }
+
+      expect(future.dup).to eq future
     end
 
   end

@@ -51,12 +51,16 @@ module Futuroscope
       resolved[:value]
     end
 
+    def __setobj__ obj
+      @resolved_future = { value: obj }
+    end
+
     def marshal_dump
       resolved_future_value
     end
 
-    def __setobj__ obj
-      @resolved_future = obj
+    def marshal_load value
+      @resolved_future = value
     end
 
     def_delegators :__getobj__, :class, :kind_of?, :is_a?, :clone
