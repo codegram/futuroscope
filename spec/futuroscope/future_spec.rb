@@ -46,7 +46,7 @@ module Futuroscope
     end
 
     it "returns the original object when future_value gets called" do
-      object = mock()
+      object = double
       future = Future.new{ object }
 
       expect(future.future_value.object_id === object.object_id).to eq(true)
