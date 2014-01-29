@@ -59,5 +59,12 @@ module Futuroscope
       expect(Marshal.load(dumped).future_value).to eq(object)
     end
 
+    it "correctly duplicates a future object" do
+      object = [1, 2, 3]
+      future = Future.new { object }
+
+      expect(future.dup).to eq future
+    end
+
   end
 end
