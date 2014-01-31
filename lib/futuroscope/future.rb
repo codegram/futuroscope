@@ -64,7 +64,7 @@ module Futuroscope
       @resolved_future = value
     end
 
-    def_delegators :__getobj__, :class, :kind_of?, :is_a?, :clone
+    def_delegators :__getobj__, :class, :kind_of?, :is_a?, :clone, :nil?
 
     alias_method :future_value, :__getobj__
 
