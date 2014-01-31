@@ -66,5 +66,32 @@ module Futuroscope
       expect(future.dup).to eq future
     end
 
+    context "when at least another thread is alive" do
+      # If no threads are alive, the VM raises an exception, therefore we need to ensure there is one.
+
+      before :each do
+        @live_thread = Thread.new { loop { } }
+      end
+
+
+      it "doesn't hang when 2 threads try to obtain its result before it's finished" do
+        test_thread = Thread.new do
+          future = Future.new { sleep 1; 1 }
+          f1 = Future.new { future + 1 }
+          f2 = Future.new { future + 2 }
+          f1.future_value
+          f2.future_value
+        end
+        sleep 2
+        expect(test_thread).to_not be_alive
+        test_thread.kill
+      end
+
+
+      after :each do
+        @live_thread.kill
+      end
+
+    end
   end
 end
