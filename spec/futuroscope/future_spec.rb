@@ -27,7 +27,6 @@ module Futuroscope
       expect(future.class).to eq(Array)
       expect(future).to be_kind_of(Enumerable)
       expect(future).to be_a(Enumerable)
-      expect(future.clone).to eq(object)
       expect(future.to_s).to eq(object.to_s)
       expect(Future.new { nil }).to be_nil
     end
@@ -65,6 +64,14 @@ module Futuroscope
       future = Future.new { object }
 
       expect(future.dup).to eq future
+    end
+
+    it "clones correctly before being resolved" do
+      object = [1, 2, 3]
+      future = Future.new { sleep 1; object }
+      clone = future.clone
+
+      expect(clone).to eq object
     end
 
     context "when at least another thread is alive" do
