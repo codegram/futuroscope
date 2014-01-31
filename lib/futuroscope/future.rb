@@ -30,6 +30,7 @@ module Futuroscope
       @queue = ::SizedQueue.new(1)
       @pool = pool
       @block = block
+      @mutex = Mutex.new
       @pool.queue self
     end
 
@@ -70,7 +71,9 @@ module Futuroscope
     private
 
     def resolved_future_value
-      @resolved_future ||= @queue.pop
+      @resolved_future || @mutex.synchronize do
+        @resolved_future ||= @queue.pop
+      end
     end
   end
 end
