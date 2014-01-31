@@ -29,6 +29,7 @@ module Futuroscope
       expect(future).to be_a(Enumerable)
       expect(future.clone).to eq(object)
       expect(future.to_s).to eq(object.to_s)
+      expect(Future.new { nil }).to be_nil
     end
 
     it "delegates missing methods" do
