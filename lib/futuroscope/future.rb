@@ -46,10 +46,7 @@ module Futuroscope
     #
     # Returns the Future's block execution result.
     def __getobj__
-      resolved = resolved_future_value
-
-      raise resolved[:exception] if resolved[:exception]
-      resolved[:value]
+      resolved_future_handling[:value]
     end
 
     def __setobj__ obj
@@ -57,7 +54,7 @@ module Futuroscope
     end
 
     def marshal_dump
-      resolved_future_value
+      resolved_future_handling
     end
 
     def marshal_load value
@@ -74,6 +71,13 @@ module Futuroscope
       @resolved_future || @mutex.synchronize do
         @resolved_future ||= @queue.pop
       end
+    end
+
+    def resolved_future_handling
+      resolved = resolved_future_value
+
+      raise resolved[:exception] if resolved[:exception]
+      resolved
     end
   end
 end
