@@ -59,6 +59,14 @@ module Futuroscope
       expect(Marshal.load(dumped).future_value).to eq(object)
     end
 
+    it "re-raises captured exception when trying to marshal" do
+      future = Future.new{ raise Exception }
+
+      expect(lambda{
+        Marshal.dump(future)
+      }).to raise_error(Exception)
+    end
+
     it "correctly duplicates a future object" do
       object = [1, 2, 3]
       future = Future.new { object }
