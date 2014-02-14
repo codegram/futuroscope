@@ -94,7 +94,7 @@ module Futuroscope
           f1.future_value
           f2.future_value
         end
-        sleep 2
+        sleep 2.5
         expect(test_thread).to_not be_alive
         test_thread.kill
       end
