@@ -70,7 +70,7 @@ module Futuroscope
     def resolved_future_value_or_raise
       resolved = resolved_future_value
 
-      raise resolved[:exception] if resolved[:exception]
+      Kernel.raise resolved[:exception] if resolved[:exception]
       resolved
     end
 

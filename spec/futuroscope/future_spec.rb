@@ -38,11 +38,9 @@ module Futuroscope
     end
 
     it "captures exceptions and re-raises them when calling the value" do
-      future = Future.new{ raise "Ed Balls" }
+      future = Future.new { raise "Ed Balls" }
 
-      expect(lambda{
-        future.inspect
-      }).to raise_error(Exception)
+      expect { future.inspect }.to raise_error RuntimeError, "Ed Balls"
     end
 
     it "returns the original object when future_value gets called" do
@@ -60,11 +58,9 @@ module Futuroscope
     end
 
     it "re-raises captured exception when trying to marshal" do
-      future = Future.new{ raise Exception }
+      future = Future.new { raise "Ed Balls" }
 
-      expect(lambda{
-        Marshal.dump(future)
-      }).to raise_error(Exception)
+      expect { Marshal.dump(future) }.to raise_error RuntimeError, "Ed Balls"
     end
 
     it "correctly duplicates a future object" do
@@ -98,7 +94,7 @@ module Futuroscope
           f1.future_value
           f2.future_value
         end
-        sleep 2
+        sleep 2.5
         expect(test_thread).to_not be_alive
         test_thread.kill
       end
