@@ -17,7 +17,7 @@ threads. HTTP calls are a good example.
 Also useful when you want to spin up a process that runs in the background, do some stuff 
 in the middle, and wait for that process to return.
 
-[![The awesome Futuroscope park](http://www.futuroscope.com/uploads/images/common/attraction/8eb495bb27d1b2102bab2db33b398c2ef6a24e2f.jpg](http://futuroscope.com)
+[![The awesome Futuroscope park](http://www.futuroscope.com/uploads/images/common/attraction/8eb495bb27d1b2102bab2db33b398c2ef6a24e2f.jpg)](http://futuroscope.com)
 
 You can learn more about futures here in this excellent article from @jpignata:
 [Concurrency Patterns in Ruby:
