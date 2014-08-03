@@ -7,7 +7,7 @@ module Futuroscope
     it "asks the pool for a new job and runs the future" do
       future = double(:future)
       pool = [future]
-      future.should_receive :run_future
+      expect(future).to receive :run_future
 
       Worker.new(pool).run
       sleep(1)
@@ -17,7 +17,7 @@ module Futuroscope
       pool = []
       worker = Worker.new(pool)
 
-      pool.should_receive(:worker_died).with(worker)
+      expect(pool).to receive(:worker_died).with(worker)
       worker.run
       sleep(1)
     end

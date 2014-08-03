@@ -16,7 +16,7 @@ module Futuroscope
         pool = Pool.new
         future = double(:future)
 
-        future.should_receive :run_future
+        expect(future).to receive :run_future
         pool.queue future
         sleep(0.1)
       end
@@ -25,7 +25,7 @@ module Futuroscope
     describe "worker control" do
       it "adds more workers when needed and returns to the default amount" do
         pool = Pool.new(2..8)
-        pool.stub(:span_chance).and_return true
+        allow(pool).to receive(:span_chance).and_return true
         10.times do |future|
           Future.new(pool){ sleep(1) }
         end
@@ -45,7 +45,7 @@ module Futuroscope
 
       it "allows overriding max workers real time" do
         pool = Pool.new(2..8)
-        pool.stub(:span_chance).and_return true
+        allow(pool).to receive(:span_chance).and_return true
         pool.max_workers = 4
 
         10.times do |future|
