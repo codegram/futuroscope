@@ -3,4 +3,5 @@ if ENV["CI"] && RUBY_ENGINE == "ruby"
   Coveralls.wear!
 end
 
+require 'rspec/collection_matchers'
 require 'futuroscope'
