@@ -1,5 +1,5 @@
-require 'set'
-require 'thread'
+require "set"
+require "thread"
 
 module Futuroscope
   module Pools

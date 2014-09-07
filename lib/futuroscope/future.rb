@@ -1,6 +1,6 @@
-require 'thread'
-require 'delegate'
-require 'forwardable'
+require "thread"
+require "delegate"
+require "forwardable"
 
 module Futuroscope
   # A Future is an object that gets initialized with a block and will behave
@@ -41,7 +41,7 @@ module Futuroscope
       @queue.push(exception: e)
     end
 
-    # Semipublic: Returns the future's value. Will wait for the future to be 
+    # Semipublic: Returns the future's value. Will wait for the future to be
     # completed or return its value otherwise. Can be called multiple times.
     #
     # Returns the Future's block execution result.

@@ -1,7 +1,7 @@
 # coding: utf-8
-lib = File.expand_path('../lib', __FILE__)
+lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'futuroscope/version'
+require "futuroscope/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "futuroscope"
@@ -23,5 +23,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "rspec-collection_matchers"
   spec.add_development_dependency "rspec-mocks"
-  spec.add_runtime_dependency 'rubysl' if RUBY_ENGINE == 'rbx'
+  spec.add_runtime_dependency "rubysl" if RUBY_ENGINE == "rbx"
 end

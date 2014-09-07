@@ -14,7 +14,7 @@ It's specially useful in situations where you have calls to an expensive resourc
 could be done in parallel (they are not chained), but you don't wanna deal with low-level
 threads. HTTP calls are a good example.
 
-Also useful when you want to spin up a process that runs in the background, do some stuff 
+Also useful when you want to spin up a process that runs in the background, do some stuff
 in the middle, and wait for that process to return.
 
 [![The awesome Futuroscope park](http://www.futuroscope.com/uploads/images/common/attraction/8eb495bb27d1b2102bab2db33b398c2ef6a24e2f.jpg)](http://futuroscope.com)
@@ -38,7 +38,7 @@ Check out [futuroscope's post on Codegram's blog](http://blog.codegram.com/2013/
 
 Add this line to your application's Gemfile:
 
-    gem 'futuroscope'
+    gem "futuroscope"
 
 And then execute:
 
@@ -52,7 +52,7 @@ Or install it yourself as:
 
 ### Simple futures
 ```Ruby
-require 'futuroscope'
+require "futuroscope"
 
 x = Futuroscope::Future.new{ sleep(1); 1 }
 y = Futuroscope::Future.new{ sleep(1); 2 }
@@ -78,7 +78,7 @@ x.future_value === string
 
 ### Future map
 ```Ruby
-require 'futuroscope'
+require "futuroscope"
 
 map = Futuroscope::Map.new([1, 2, 3]).map do |i|
   sleep(1)
@@ -103,7 +103,7 @@ If you don't mind polluting the `Kernel` module, you can also require
 futuroscope's convenience `future` method:
 
 ```Ruby
-require 'futuroscope/convenience'
+require "futuroscope/convenience"
 
 x = future{ sleep(1); 1 }
 y = future{ sleep(1); 2 }
@@ -116,7 +116,7 @@ puts x + y + z
 Same for a map:
 
 ```Ruby
-require 'futuroscope/convenience'
+require "futuroscope/convenience"
 
 items = [1, 2, 3].future_map do |i|
   sleep(i)
@@ -190,10 +190,9 @@ end
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
+3. Commit your changes (`git commit -am "Add some feature"`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
 
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/codegram/futuroscope/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
