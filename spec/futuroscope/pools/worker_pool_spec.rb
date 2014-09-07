@@ -24,8 +24,8 @@ module Futuroscope
         it "adds more workers when needed and returns to the default amount" do
           pool = WorkerPool.new(2..8)
           allow(pool).to receive(:span_chance).and_return true
-          10.times do |future|
-            Future.new(pool){ sleep(1) }
+          10.times do
+            Future.new(pool) { sleep(1) }
           end
 
           sleep(0.5)
@@ -46,8 +46,8 @@ module Futuroscope
           allow(pool).to receive(:span_chance).and_return true
           pool.max_workers = 4
 
-          10.times do |future|
-            Future.new(pool){ sleep(1) }
+          10.times do
+            Future.new(pool) { sleep(1) }
           end
 
           sleep(0.5)

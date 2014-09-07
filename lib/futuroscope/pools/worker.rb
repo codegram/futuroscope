@@ -16,9 +16,10 @@ module Futuroscope
       # until there's a new future available to process.
       def run
         @thread = Thread.new do
-          while(future = @pool.pop) do
+          while (future = @pool.pop)
             future.run_future
           end
+
           die
         end
       end
@@ -26,6 +27,7 @@ module Futuroscope
       # Public: Stops this worker.
       def stop
         @thread.kill
+
         die
       end
 

@@ -3,9 +3,9 @@ require 'thread'
 
 module Futuroscope
   module Pools
-    # Futuroscope's pool is design to control concurency and keep it between some
-    # certain benefits. Moreover, we warm up the threads beforehand so we don't
-    # have to spin them up each time a future is created.
+    # Futuroscope's pool is design to control concurency and keep it between
+    # some certain benefits. Moreover, we warm up the threads beforehand so we
+    # don't have to spin them up each time a future is created.
     class WorkerPool < Pool
       attr_reader :workers
       attr_accessor :min_workers, :max_workers
@@ -25,6 +25,7 @@ module Futuroscope
       def queue(future)
         @mutex.synchronize do
           spin_worker if can_spin_extra_workers?
+
           @queue.push future
         end
       end
@@ -37,7 +38,8 @@ module Futuroscope
         @mutex.synchronize do
           return nil if @queue.empty? && more_workers_than_needed?
         end
-        return @queue.pop
+
+        @queue.pop
       end
 
       # Internal: Notifies that a worker just died so it can be removed from the
@@ -59,7 +61,7 @@ module Futuroscope
 
       def warm_up_workers
         @mutex.synchronize do
-          while(@workers.length < @min_workers) do
+          while (@workers.length < @min_workers)
             spin_worker
           end
         end
