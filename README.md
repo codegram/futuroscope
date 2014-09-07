@@ -157,7 +157,7 @@ Futuroscope.default_pool.max_workers = 16
 Also, each future can be scheduled to a different pool like this:
 
 ```Ruby
-pool = Futuroscope::Pool.new(16..32)
+pool = Futuroscope::Pools::WorkerPool.new(16..32)
 
 future = Future.new(pool){ :edballs }
 

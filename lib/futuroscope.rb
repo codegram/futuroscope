@@ -1,5 +1,6 @@
 require "futuroscope/version"
 require "futuroscope/pool"
+require 'futuroscope/pools/worker_pool'
 require "futuroscope/future"
 require "futuroscope/map"
 
@@ -8,7 +9,7 @@ module Futuroscope
   #
   # Returns a Pool
   def self.default_pool
-    @default_pool ||= Pool.new
+    @default_pool ||= Pools::WorkerPool.new
   end
 
   # Sets a new default pool. It's useful when you want to set a different
