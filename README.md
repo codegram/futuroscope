@@ -165,6 +165,27 @@ future = Future.new(pool){ :edballs }
 future = future(pool){ :edballs }
 ```
 
+## Disabling concurrency
+
+Sometimes you may want to run futures in the main thread, instead of worker
+threads, e.g. for simpler testing. Therefore you can use the
+`Futuroscope::Pools::NoPool`, that runs futures directly instead of queueing
+them.
+
+```ruby
+# Globally
+Futuroscope.default_pool = Futuroscope::Pools::NoPool.new
+
+Futuroscope::Future.new { puts "No concurrency here" }
+
+# Locally
+pool = Futuroscope::Pools::NoPool.new
+
+Futuroscope::Future.new(pool) do
+  puts "No concurrency here"
+end
+```
+
 ## Contributing
 
 1. Fork it
