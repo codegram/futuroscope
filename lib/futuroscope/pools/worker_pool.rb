@@ -1,6 +1,5 @@
 require 'set'
 require 'thread'
-require 'futuroscope/pools/worker'
 
 module Futuroscope
   module Pools
