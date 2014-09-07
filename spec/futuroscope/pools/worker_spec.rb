@@ -1,5 +1,4 @@
-require 'spec_helper'
-require 'futuroscope'
+require "futuroscope"
 
 module Futuroscope
   module Pools

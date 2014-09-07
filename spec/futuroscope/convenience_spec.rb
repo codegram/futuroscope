@@ -1,6 +1,5 @@
-require 'spec_helper'
-require 'futuroscope/convenience'
-require 'timeout'
+require "futuroscope/convenience"
+require "timeout"
 
 describe "Kernel#future" do
   it "adds a convenience method to ruby's kernel" do

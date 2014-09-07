@@ -1,5 +1,4 @@
-require 'spec_helper'
-require 'futuroscope'
+require "futuroscope"
 
 describe Futuroscope do
   describe "default_pool" do

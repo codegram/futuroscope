@@ -1,6 +1,5 @@
-require 'spec_helper'
-require 'futuroscope/future'
-require 'timeout'
+require "futuroscope/future"
+require "timeout"
 
 module Futuroscope
   describe Future do
