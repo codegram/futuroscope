@@ -1,5 +1,3 @@
-require "futuroscope/map"
-
 module Futuroscope
   describe Map do
     it "behaves like a normal map" do

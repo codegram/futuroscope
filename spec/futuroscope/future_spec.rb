@@ -1,4 +1,3 @@
-require "futuroscope/future"
 require "timeout"
 
 module Futuroscope

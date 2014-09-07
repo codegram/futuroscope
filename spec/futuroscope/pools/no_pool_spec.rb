@@ -1,5 +1,3 @@
-require "futuroscope"
-
 module Futuroscope
   module Pools
     describe NoPool do

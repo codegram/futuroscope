@@ -1,5 +1,3 @@
-require "futuroscope/pool"
-
 module Futuroscope
   module Pools
     describe WorkerPool do
