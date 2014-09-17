@@ -8,7 +8,7 @@ module Futuroscope
   # the future. That is, will block when the result is not ready until it is,
   # and will return it instantly if the thread's execution already finished.
   #
-  class Future < Delegator
+  class Future < ::Delegator
     extend ::Forwardable
 
     # Initializes a future with a block and starts its execution.
@@ -30,7 +30,7 @@ module Futuroscope
       @queue = ::SizedQueue.new(1)
       @pool = pool
       @block = block
-      @mutex = Mutex.new
+      @mutex = ::Mutex.new
       @pool.queue self
     end
 
@@ -41,7 +41,7 @@ module Futuroscope
       @queue.push(exception: e)
     end
 
-    # Semipublic: Returns the future's value. Will wait for the future to be 
+    # Semipublic: Returns the future's value. Will wait for the future to be
     # completed or return its value otherwise. Can be called multiple times.
     #
     # Returns the Future's block execution result.
@@ -70,7 +70,7 @@ module Futuroscope
     def resolved_future_value_or_raise
       resolved = resolved_future_value
 
-      Kernel.raise resolved[:exception] if resolved[:exception]
+      ::Kernel.raise resolved[:exception] if resolved[:exception]
       resolved
     end
 
