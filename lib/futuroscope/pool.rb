@@ -29,8 +29,10 @@ module Futuroscope
     # future - The Future to push.
     def push(future)
       @mutex.synchronize do
+        Futuroscope.info "PUSH:   added future #{future.__id__}"
         spin_worker if need_extra_worker?
         @priorities[future.__id__] = 0
+        Futuroscope.info "        sending signal to wake up a thread. the priorities are: #{@priorities.map { |k, v| ["future #{(k)}", v] }.to_h}"
         @future_needs_worker.signal
       end
     end
@@ -48,10 +50,12 @@ module Futuroscope
 
     # Public: Indicates that the current thread is waiting for a Future.
     #
-    # dependee - The Future being waited for.
+    # future - The Future being waited for.
     def depend(future)
       @mutex.synchronize do
+        Futuroscope.info "DEPEND: thread #{Thread.current.__id__} depends on future #{future.__id__}"
         @dependencies[Thread.current] = future
+        Futuroscope.info "        the current dependencies are: #{@dependencies.map { |k, v| ["thread #{k.__id__}", "future #{v.__id__}"] }.to_h}"
         handle_deadlocks
         dependent_future_id = current_thread_future_id
         incr = 1 + (dependent_future_id.nil? ? 0 : @priorities[dependent_future_id])
@@ -62,8 +66,9 @@ module Futuroscope
     # Semipublic: Called by a worker to indicate that it finished resolving a future.
     def done_with(future)
       @mutex.synchronize do
-        @priorities.delete_if { |future_id, priority| future_id == future.__id__ }
-        @dependencies.delete_if { |dependent, dependee| dependee.__id__ == future.__id__ }
+        Futuroscope.info "DONE:   thread #{Thread.current.__id__} is done with future #{future.__id__}"
+        @priorities.delete_if { |future_id, priority| Futuroscope.info "        deleting future #{future_id}" if future_id == future.__id__; future_id == future.__id__ }
+        @dependencies.delete_if { |dependent, dependee| Futuroscope.info "        deleting dependency from thread #{dependent.__id__} to future #{dependee.__id__}" if dependee.__id__ == future.__id__; dependee.__id__ == future.__id__ }
       end
     end
 
@@ -102,6 +107,7 @@ module Futuroscope
       worker = Worker.new(self)
       workers << worker
       worker.run
+      Futuroscope.info "        spun up worker with thread #{worker.thread.__id__}"
     end
 
     def find_cycle
@@ -119,6 +125,7 @@ module Futuroscope
 
     def increment_priority(future, increment)
       return nil if NilClass === future
+      Futuroscope.info "        incrementing priority for future #{future.__id__}"
       @priorities[future.__id__] += increment
       increment_priority(@dependencies[future.worker_thread], increment)
     end
@@ -129,14 +136,19 @@ module Futuroscope
 
     def await_future(timeout)
       until @priorities.any? { |future_id, priority| ObjectSpace._id2ref(future_id).worker_thread.nil? }
+        Futuroscope.info "POP:    thread #{Thread.current.__id__} going to sleep until there's something to do#{timeout && " or #{timeout} seconds"}..."
         @future_needs_worker.wait(@mutex, timeout)
+        Futuroscope.info "POP:    ... thread #{Thread.current.__id__} woke up, the priorities are: #{@priorities.map { |k, v| ["future #{(k)}", v] }.to_h}"
+        Futuroscope.info "        current future workers are: #{@priorities.map { |k, v| ["future #{(k)}", (thread = ObjectSpace._id2ref(k).worker_thread; thread.nil? ? nil : "thread #{thread.__id__}")] }.to_h}"
         unless timeout.nil? || @priorities.any? { |future_id, priority| ObjectSpace._id2ref(future_id).worker_thread.nil? }
+          Futuroscope.info "        thread #{Thread.current.__id__} is dying because there's nothing to do"
           workers.delete_if { |worker| worker.thread == Thread.current }
           return nil
         end
       end
       future_id = @priorities.select { |future_id, priority| ObjectSpace._id2ref(future_id).worker_thread.nil? }
       .max_by { |future_id, priority| priority }.first
+      Futuroscope.info "POP:    thread #{Thread.current.__id__} will start working on future #{future_id}"
       future = ObjectSpace._id2ref(future_id)
       future.worker_thread = Thread.current
       future
@@ -149,8 +161,8 @@ module Futuroscope
             cycle.each { |thread| thread.raise DeadlockError, "Cyclical dependency detected, the future was aborted." }
           end
           if workers.all? { |worker| @dependencies.has_key?(worker.thread) } && workers.count == max_workers
-            least_priority_future = ObjectSpace._id2ref(@priorities.min_by { |future_id, priority| priority }.first)
-            least_priority_future.worker_thread.raise DeadlockError, "Pool size is too low, the future was aborted."
+            least_priority_future_id = @priorities.sort_by(&:last).map(&:first).find { |future_id| !ObjectSpace._id2ref(future_id).worker_thread.nil? }
+            ObjectSpace._id2ref(least_priority_future_id).worker_thread.raise DeadlockError, "Pool size is too low, the future was aborted."
           end
         end
       end

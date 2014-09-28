@@ -21,4 +21,17 @@ module Futuroscope
   def self.default_pool=(pool)
     @default_pool = pool
   end
+
+  # Gets the current loggers. Add objects to it that have the below methods defined to log on them.
+  # For example, instances of Ruby's core Logger will work.
+  def self.loggers
+    @loggers ||= []
+  end
+
+  # Inward facing methods, called whenever a component wants to log something to the loggers.
+  [:debug, :info, :warn, :error, :fatal].each do |log_method|
+    define_singleton_method(log_method) do |message|
+      loggers.each { |logger| logger.send(log_method, message) }
+    end
+  end
 end

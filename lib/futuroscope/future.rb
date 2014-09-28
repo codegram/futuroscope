@@ -45,7 +45,7 @@ module Futuroscope
     def resolve!
       @mutex.synchronize do
         begin
-          Thread.handle_interrupt(DeadlockError => :on_blocking) do
+          Thread.handle_interrupt(DeadlockError => :immediate) do
             @resolved_future = { value: @block.call }
           end
         rescue ::Exception => e
