@@ -12,14 +12,5 @@ module Futuroscope
       Worker.new(pool).run
       sleep(1)
     end
-
-    it "notifies the pool when the worker died because there's no job" do
-      pool = []
-      worker = Worker.new(pool)
-
-      expect(pool).to receive(:worker_died).with(worker)
-      worker.run
-      sleep(1)
-    end
   end
 end

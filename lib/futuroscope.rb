@@ -1,7 +1,8 @@
-require "futuroscope/version"
-require "futuroscope/pool"
+require "futuroscope/deadlock_error"
 require "futuroscope/future"
 require "futuroscope/map"
+require "futuroscope/pool"
+require "futuroscope/version"
 
 module Futuroscope
   # Gets the default futuroscope's pool.
