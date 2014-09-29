@@ -33,7 +33,8 @@ module Futuroscope
         Futuroscope.info "PUSH:   added future #{future.__id__}"
         spin_worker if need_extra_worker?
         @priorities[future.__id__] = 0
-        Futuroscope.info "        sending signal to wake up a thread. the priorities are: #{@priorities.map { |k, v| ["future #{(k)}", v] }.to_h}"
+        Futuroscope.info "        sending signal to wake up a thread"
+        Futuroscope.debug "        current priorities: #{@priorities.map { |k, v| ["future #{(k)}", v] }.to_h}"
         @future_needs_worker.signal
       end
     end
@@ -58,7 +59,7 @@ module Futuroscope
       @mutex.synchronize do
         Futuroscope.info "DEPEND: thread #{Thread.current.__id__} depends on future #{future.__id__}"
         @dependencies[Thread.current] = future
-        Futuroscope.info "        the current dependencies are: #{@dependencies.map { |k, v| ["thread #{k.__id__}", "future #{v.__id__}"] }.to_h}"
+        Futuroscope.debug "        current dependencies: #{@dependencies.map { |k, v| ["thread #{k.__id__}", "future #{v.__id__}"] }.to_h}"
         handle_deadlocks
         dependent_future_id = current_thread_future_id
         incr = 1 + (dependent_future_id.nil? ? 0 : @priorities[dependent_future_id])
@@ -138,8 +139,9 @@ module Futuroscope
       until @priorities.any? { |future_id, priority| ObjectSpace._id2ref(future_id).worker_thread.nil? }
         Futuroscope.info "POP:    thread #{Thread.current.__id__} going to sleep until there's something to do#{timeout && " or #{timeout} seconds"}..."
         @future_needs_worker.wait(@mutex, timeout)
-        Futuroscope.info "POP:    ... thread #{Thread.current.__id__} woke up, the priorities are: #{@priorities.map { |k, v| ["future #{(k)}", v] }.to_h}"
-        Futuroscope.info "        current future workers are: #{@priorities.map { |k, v| ["future #{(k)}", (thread = ObjectSpace._id2ref(k).worker_thread; thread.nil? ? nil : "thread #{thread.__id__}")] }.to_h}"
+        Futuroscope.info "POP:    ... thread #{Thread.current.__id__} woke up"
+        Futuroscope.debug "        current priorities: #{@priorities.map { |k, v| ["future #{(k)}", v] }.to_h}"
+        Futuroscope.debug "        current future workers: #{@priorities.map { |k, v| ["future #{(k)}", (thread = ObjectSpace._id2ref(k).worker_thread; thread.nil? ? nil : "thread #{thread.__id__}")] }.to_h}"
         unless timeout.nil? || @priorities.any? { |future_id, priority| ObjectSpace._id2ref(future_id).worker_thread.nil? }
           Futuroscope.info "        thread #{Thread.current.__id__} is dying because there's nothing to do"
           workers.delete_if { |worker| worker.thread == Thread.current }
@@ -159,12 +161,12 @@ module Futuroscope
       Thread.handle_interrupt(DeadlockError => :immediate) do
         Thread.handle_interrupt(DeadlockError => :never) do
           unless (cycle = find_cycle).nil?
-            Futuroscope.info "        deadlock! cyclical dependency, sending interrupt to all threads involved"
+            Futuroscope.error "        deadlock! cyclical dependency, sending interrupt to all threads involved"
             cycle.each { |thread| thread.raise DeadlockError, "Cyclical dependency detected, the future was aborted." }
           end
           if cycleless_deadlock?
             thread_to_interrupt = least_priority_independent_thread
-            Futuroscope.info "        deadlock! ran out of workers, sending interrupt to thread #{thread_to_interrupt.__id__}"
+            Futuroscope.error "        deadlock! ran out of workers, sending interrupt to thread #{thread_to_interrupt.__id__}"
             thread_to_interrupt.raise DeadlockError, "Pool size is too low, the future was aborted."
           end
         end
