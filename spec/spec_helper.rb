@@ -4,3 +4,4 @@ if ENV["CI"] && RUBY_ENGINE == "ruby"
 end
 
 require 'rspec/collection_matchers'
+require 'futuroscope'
