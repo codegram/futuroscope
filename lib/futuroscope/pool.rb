@@ -24,6 +24,7 @@ module Futuroscope
       warm_up_workers
     end
 
+
     # Public: Pushes a Future into the worklist with low priority.
     #
     # future - The Future to push.
@@ -37,6 +38,7 @@ module Futuroscope
       end
     end
 
+
     # Public: Pops a new job from the pool. It will return nil if there's
     # enough workers in the pool to take care of it.
     #
@@ -47,6 +49,7 @@ module Futuroscope
         await_future(kill_worker ? 5 : nil)
       end
     end
+
 
     # Public: Indicates that the current thread is waiting for a Future.
     #
@@ -63,6 +66,7 @@ module Futuroscope
       end
     end
 
+
     # Semipublic: Called by a worker to indicate that it finished resolving a future.
     def done_with(future)
       @mutex.synchronize do
@@ -72,10 +76,12 @@ module Futuroscope
       end
     end
 
+
     def min_workers=(count)
       @min_workers = count
       warm_up_workers
     end
+
 
     private
 
@@ -87,17 +93,21 @@ module Futuroscope
       end
     end
 
+
     def need_extra_worker?
       workers.length < max_workers && @priorities.length > workers.count(&:free)
     end
+
 
     def more_workers_than_needed?
       workers.length > min_workers && @priorities.length < workers.count(&:free)
     end
 
+
     def finalize
       workers.each { |worker| worker.thread.kill }
     end
+
 
     # The below methods should only be called with @mutex already acquired.
     # These are only extracted for readability purposes.
@@ -110,6 +120,7 @@ module Futuroscope
       Futuroscope.info "        spun up worker with thread #{worker.thread.__id__}"
     end
 
+
     def increment_priority(future, increment)
       return nil if NilClass === future
       Futuroscope.info "        incrementing priority for future #{future.__id__}"
@@ -117,9 +128,11 @@ module Futuroscope
       increment_priority(@dependencies[future.worker_thread], increment)
     end
 
+
     def current_thread_future_id
       @priorities.keys.find { |id| ObjectSpace._id2ref(id).worker_thread == Thread.current }
     end
+
 
     def await_future(timeout)
       until @priorities.any? { |future_id, priority| ObjectSpace._id2ref(future_id).worker_thread.nil? }
@@ -141,6 +154,7 @@ module Futuroscope
       future
     end
 
+
     def handle_deadlocks
       Thread.handle_interrupt(DeadlockError => :immediate) do
         Thread.handle_interrupt(DeadlockError => :never) do
@@ -157,6 +171,7 @@ module Futuroscope
       end
     end
 
+
     def find_cycle
       chain = [Thread.current]
       loop do
@@ -170,9 +185,11 @@ module Futuroscope
       end
     end
 
+
     def cycleless_deadlock?
       workers.all? { |worker| @dependencies.has_key?(worker.thread) } && workers.count == max_workers
     end
+
 
     def least_priority_independent_thread
       @priorities.sort_by(&:last).map(&:first).each do |future_id|
