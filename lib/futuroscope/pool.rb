@@ -162,11 +162,10 @@ module Futuroscope
     def handle_deadlocks
       Thread.handle_interrupt(DeadlockError => :immediate) do
         Thread.handle_interrupt(DeadlockError => :never) do
-          unless (cycle = find_cycle).nil?
+          if !(cycle = find_cycle).nil?
             Futuroscope.error "        deadlock! cyclical dependency, sending interrupt to all threads involved"
             cycle.each { |thread| thread.raise DeadlockError, "Cyclical dependency detected, the future was aborted." }
-          end
-          if cycleless_deadlock?
+          elsif cycleless_deadlock?
             thread_to_interrupt = least_priority_independent_thread
             Futuroscope.error "        deadlock! ran out of workers, sending interrupt to thread #{thread_to_interrupt.__id__}"
             thread_to_interrupt.raise DeadlockError, "Pool size is too low, the future was aborted."
