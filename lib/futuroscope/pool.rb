@@ -105,7 +105,10 @@ module Futuroscope
 
 
     def finalize
-      workers.each { |worker| worker.thread.kill }
+      workers.each do |worker|
+        workers.delete worker
+        worker.thread.kill
+      end
     end
 
 
