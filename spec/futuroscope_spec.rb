@@ -12,4 +12,21 @@ describe Futuroscope do
       expect(Futuroscope.default_pool).to equal(pool)
     end
   end
+
+  describe "logging" do
+    it "logs messages to all the given loggers" do
+      logger1 = double "Logger 1"
+      logger2 = double "Logger 2"
+      Futuroscope.loggers << logger1 << logger2
+
+      expect(logger1).to receive(:info).at_least(33).times
+      expect(logger2).to receive(:info).at_least(33).times
+
+      expect(logger1).to receive(:debug).at_least(7).times
+      expect(logger2).to receive(:debug).at_least(7).times
+
+      Futuroscope::Future.new { Futuroscope::Future.new { 1 } + 1 }
+      sleep(0.1)
+    end
+  end
 end
