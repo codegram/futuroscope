@@ -110,19 +110,6 @@ module Futuroscope
       Futuroscope.info "        spun up worker with thread #{worker.thread.__id__}"
     end
 
-    def find_cycle
-      chain = [Thread.current]
-      loop do
-        last_thread = chain.last
-        return nil unless @dependencies.has_key?(last_thread)
-        next_future = @dependencies[last_thread]
-        next_thread = next_future.worker_thread
-        return nil if next_thread.nil?
-        return chain if next_thread == chain.first
-        chain << next_thread
-      end
-    end
-
     def increment_priority(future, increment)
       return nil if NilClass === future
       Futuroscope.info "        incrementing priority for future #{future.__id__}"
@@ -158,13 +145,39 @@ module Futuroscope
       Thread.handle_interrupt(DeadlockError => :immediate) do
         Thread.handle_interrupt(DeadlockError => :never) do
           unless (cycle = find_cycle).nil?
+            Futuroscope.info "        deadlock! cyclical dependency, sending interrupt to all threads involved"
             cycle.each { |thread| thread.raise DeadlockError, "Cyclical dependency detected, the future was aborted." }
           end
-          if workers.all? { |worker| @dependencies.has_key?(worker.thread) } && workers.count == max_workers
-            least_priority_future_id = @priorities.sort_by(&:last).map(&:first).find { |future_id| !ObjectSpace._id2ref(future_id).worker_thread.nil? }
-            ObjectSpace._id2ref(least_priority_future_id).worker_thread.raise DeadlockError, "Pool size is too low, the future was aborted."
+          if cycleless_deadlock?
+            thread_to_interrupt = least_priority_independent_thread
+            Futuroscope.info "        deadlock! ran out of workers, sending interrupt to thread #{thread_to_interrupt.__id__}"
+            thread_to_interrupt.raise DeadlockError, "Pool size is too low, the future was aborted."
           end
         end
+      end
+    end
+
+    def find_cycle
+      chain = [Thread.current]
+      loop do
+        last_thread = chain.last
+        return nil unless @dependencies.has_key?(last_thread)
+        next_future = @dependencies[last_thread]
+        next_thread = next_future.worker_thread
+        return nil if next_thread.nil?
+        return chain if next_thread == chain.first
+        chain << next_thread
+      end
+    end
+
+    def cycleless_deadlock?
+      workers.all? { |worker| @dependencies.has_key?(worker.thread) } && workers.count == max_workers
+    end
+
+    def least_priority_independent_thread
+      @priorities.sort_by(&:last).map(&:first).each do |future_id|
+        its_thread = ObjectSpace._id2ref(future_id).worker_thread
+        return its_thread if !its_thread.nil? && @dependencies[its_thread].worker_thread.nil?
       end
     end
 
