@@ -1,5 +1,4 @@
 require 'set'
-require 'thread'
 require 'futuroscope/worker'
 
 module Futuroscope
