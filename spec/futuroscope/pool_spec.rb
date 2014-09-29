@@ -19,6 +19,24 @@ module Futuroscope
       end
     end
 
+    describe "depend" do
+      it "detects cyclical dependencies" do
+        pool = Pool.new(2..2)
+        f2 = nil
+        f1 = Future.new(pool) { f2 = Future.new(pool) { f1.future_value }; f2.future_value }
+
+        expect { f1.future_value }.to raise_error Futuroscope::DeadlockError, /Cyclical dependency detected/
+        expect { f2.future_value }.to raise_error Futuroscope::DeadlockError, /Cyclical dependency detected/
+      end
+
+      it "detects non-cyclical deadlocks (when the pool is full and all futures are waiting for another future)" do
+        pool = Pool.new(1..1)
+        f = Future.new(pool) { Future.new(pool) { 1 } + 1 }
+
+        expect { f.future_value }.to raise_error Futuroscope::DeadlockError, /Pool size is too low/
+      end
+    end
+
     describe "worker control" do
       it "adds more workers when needed and returns to the default amount" do
         pool = Pool.new(2..8)
