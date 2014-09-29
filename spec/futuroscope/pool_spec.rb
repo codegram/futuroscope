@@ -1,6 +1,3 @@
-require 'spec_helper'
-require 'futuroscope/pool'
-
 module Futuroscope
   describe Pool do
     it "spins up a number of workers" do

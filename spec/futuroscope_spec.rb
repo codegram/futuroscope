@@ -1,6 +1,3 @@
-require 'spec_helper'
-require 'futuroscope'
-
 describe Futuroscope do
   describe "default_pool" do
     it "returns a pool by default" do

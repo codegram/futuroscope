@@ -1,6 +1,3 @@
-require 'spec_helper'
-require 'futuroscope/map'
-
 module Futuroscope
   describe Map do
     it "behaves like a normal map" do
@@ -9,7 +6,7 @@ module Futuroscope
         sleep(item)
         "Item #{item}"
       end
-      
+
       Timeout::timeout(4) do
         expect(result.first).to eq("Item 1")
         expect(result[1]).to eq("Item 2")

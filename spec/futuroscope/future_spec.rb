@@ -1,5 +1,3 @@
-require 'spec_helper'
-require 'futuroscope/future'
 require 'timeout'
 
 module Futuroscope
