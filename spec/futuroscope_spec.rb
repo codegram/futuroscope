@@ -26,7 +26,7 @@ describe Futuroscope do
       expect(logger2).to receive(:debug).at_least(7).times
 
       Futuroscope::Future.new { Futuroscope::Future.new { 1 } + 1 }
-      sleep(0.1)
+      sleep(0.5)
     end
   end
 end
