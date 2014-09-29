@@ -6,8 +6,8 @@ module Futuroscope
   # certain benefits. Moreover, we warm up the threads beforehand so we don't
   # have to spin them up each time a future is created.
   class Pool
-    attr_reader :workers
-    attr_accessor :min_workers, :max_workers
+    attr_reader :workers, :min_workers
+    attr_accessor :max_workers
 
     # Public: Initializes a new Pool.
     #
@@ -97,7 +97,7 @@ module Futuroscope
 
     def warm_up_workers
       @mutex.synchronize do
-        while workers.length < @min_workers do
+        while workers.length < min_workers do
           spin_worker
         end
       end
