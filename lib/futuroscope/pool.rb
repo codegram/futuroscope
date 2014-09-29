@@ -46,7 +46,7 @@ module Futuroscope
     def pop
       @mutex.synchronize do
         kill_worker = more_workers_than_needed? && @priorities.empty?
-        await_future(kill_worker ? 5 : nil)
+        await_future(kill_worker ? 2 : nil)
       end
     end
 
