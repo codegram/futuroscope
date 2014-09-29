@@ -21,6 +21,12 @@ module Futuroscope
       @workers = ::Set.new
       @mutex = ::Mutex.new
       warm_up_workers
+
+      # We need to keep references to the futures to prevent them from being GC'd.
+      # However, they can't be the keys of @priorities, because Hash will call #hash on them, which is forwarded to the
+      # wrapped object, causing a deadlock. Not forwarding is not an option, because then to the outside world
+      # futures won't be transparent: hsh[:key] will not be the same as hsh[future { :key }].
+      @futures = {}
     end
 
 
@@ -30,10 +36,11 @@ module Futuroscope
     def push(future)
       @mutex.synchronize do
         Futuroscope.info "PUSH:   added future #{future.__id__}"
-        spin_worker if need_extra_worker?
         @priorities[future.__id__] = 0
+        @futures[future.__id__] = future
+        spin_worker if need_extra_worker?
         Futuroscope.info "        sending signal to wake up a thread"
-        Futuroscope.debug "        current priorities: #{@priorities.map { |k, v| ["future #{(k)}", v] }.to_h}"
+        Futuroscope.debug "        current priorities: #{@priorities.map { |k, v| ["future #{k}", v] }.to_h}"
         @future_needs_worker.signal
       end
     end
@@ -71,8 +78,14 @@ module Futuroscope
     def done_with(future)
       @mutex.synchronize do
         Futuroscope.info "DONE:   thread #{Thread.current.__id__} is done with future #{future.__id__}"
-        @priorities.delete_if { |future_id, priority| Futuroscope.info "        deleting future #{future_id}" if future_id == future.__id__; future_id == future.__id__ }
-        @dependencies.delete_if { |dependent, dependee| Futuroscope.info "        deleting dependency from thread #{dependent.__id__} to future #{dependee.__id__}" if dependee.__id__ == future.__id__; dependee.__id__ == future.__id__ }
+        Futuroscope.info "        deleting future #{future_id} from the task list"
+        @futures.delete future.__id__
+        @priorities.delete future.__id__
+        dependencies_to_delete = @dependencies.select { |dependent, dependee| dependee.__id__ == future.__id__ }
+        dependencies_to_delete.each do |dependent, dependee|
+          Futuroscope.info "        deleting dependency from thread #{dependent.__id__} to future #{dependee.__id__}"
+          @dependencies.delete dependent
+        end
       end
     end
 
@@ -133,27 +146,26 @@ module Futuroscope
 
 
     def current_thread_future_id
-      @priorities.keys.find { |id| ObjectSpace._id2ref(id).worker_thread == Thread.current }
+      @priorities.keys.find { |id| @futures[id].worker_thread == Thread.current }
     end
 
 
     def await_future(timeout)
-      until @priorities.any? { |future_id, priority| ObjectSpace._id2ref(future_id).worker_thread.nil? }
+      until @priorities.any? { |future_id, priority| @futures[future_id].worker_thread.nil? }
         Futuroscope.info "POP:    thread #{Thread.current.__id__} going to sleep until there's something to do#{timeout && " or #{timeout} seconds"}..."
         @future_needs_worker.wait(@mutex, timeout)
         Futuroscope.info "POP:    ... thread #{Thread.current.__id__} woke up"
-        Futuroscope.debug "        current priorities: #{@priorities.map { |k, v| ["future #{(k)}", v] }.to_h}"
-        Futuroscope.debug "        current future workers: #{@priorities.map { |k, v| ["future #{(k)}", (thread = ObjectSpace._id2ref(k).worker_thread; thread.nil? ? nil : "thread #{thread.__id__}")] }.to_h}"
-        unless timeout.nil? || @priorities.any? { |future_id, priority| ObjectSpace._id2ref(future_id).worker_thread.nil? }
+        Futuroscope.debug "        current priorities: #{@priorities.map { |k, v| ["future #{k}", v] }.to_h}"
+        Futuroscope.debug "        current future workers: #{@priorities.map { |k, v| ["future #{k}", (thread = @futures[k].worker_thread; thread.nil? ? nil : "thread #{thread.__id__}")] }.to_h}"
+        unless timeout.nil? || @priorities.any? { |future_id, priority| @futures[future_id].worker_thread.nil? }
           Futuroscope.info "        thread #{Thread.current.__id__} is dying because there's nothing to do"
           workers.delete_if { |worker| worker.thread == Thread.current }
           return nil
         end
       end
-      future_id = @priorities.select { |future_id, priority| ObjectSpace._id2ref(future_id).worker_thread.nil? }
-      .max_by { |future_id, priority| priority }.first
+      future_id = @priorities.select { |future_id, priority| @futures[future_id].worker_thread.nil? }.max_by { |future_id, priority| priority }.first
       Futuroscope.info "POP:    thread #{Thread.current.__id__} will start working on future #{future_id}"
-      future = ObjectSpace._id2ref(future_id)
+      future = @futures[future_id]
       future.worker_thread = Thread.current
       future
     end
@@ -197,7 +209,7 @@ module Futuroscope
 
     def least_priority_independent_thread
       @priorities.sort_by(&:last).map(&:first).each do |future_id|
-        its_thread = ObjectSpace._id2ref(future_id).worker_thread
+        its_thread = @futures[future_id].worker_thread
         return its_thread if !its_thread.nil? && @dependencies[its_thread].worker_thread.nil?
       end
     end
