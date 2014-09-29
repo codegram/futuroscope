@@ -8,13 +8,13 @@ module Futuroscope
       expect(pool.workers).to have(3).workers
     end
 
-    describe "queue" do
+    describe "push" do
       it "enqueues a job and runs it" do
         pool = Pool.new
-        future = double(:future)
+        future = Struct.new(:worker_thread).new(nil)
 
-        expect(future).to receive :run_future
-        pool.queue future
+        expect(future).to receive :resolve!
+        pool.push future
         sleep(0.1)
       end
     end
@@ -22,15 +22,14 @@ module Futuroscope
     describe "worker control" do
       it "adds more workers when needed and returns to the default amount" do
         pool = Pool.new(2..8)
-        allow(pool).to receive(:span_chance).and_return true
-        10.times do |future|
+        10.times do
           Future.new(pool){ sleep(1) }
         end
 
         sleep(0.5)
         expect(pool.workers).to have(8).workers
 
-        sleep(1.5)
+        sleep(3)
         expect(pool.workers).to have(2).workers
       end
 
@@ -61,15 +60,6 @@ module Futuroscope
         pool.send(:finalize)
 
         expect(pool.workers).to have(0).workers
-      end
-    end
-
-    describe "#span_chance" do
-      it "returns true or false randomly" do
-        pool = Pool.new
-        chance = pool.send(:span_chance)
-
-        expect([true, false]).to include(chance)
       end
     end
   end

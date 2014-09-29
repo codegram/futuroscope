@@ -51,10 +51,7 @@ module Futuroscope
     #
     # Returns a Future
     def pop
-      @mutex.synchronize do
-        kill_worker = more_workers_than_needed? && @priorities.empty?
-        await_future(kill_worker ? 2 : nil)
-      end
+      @mutex.synchronize { await_future(more_workers_than_needed? ? 2 : nil) }
     end
 
 
@@ -78,7 +75,7 @@ module Futuroscope
     def done_with(future)
       @mutex.synchronize do
         Futuroscope.info "DONE:   thread #{Thread.current.__id__} is done with future #{future.__id__}"
-        Futuroscope.info "        deleting future #{future_id} from the task list"
+        Futuroscope.info "        deleting future #{future.__id__} from the task list"
         @futures.delete future.__id__
         @priorities.delete future.__id__
         dependencies_to_delete = @dependencies.select { |dependent, dependee| dependee.__id__ == future.__id__ }
@@ -104,16 +101,6 @@ module Futuroscope
           spin_worker
         end
       end
-    end
-
-
-    def need_extra_worker?
-      workers.length < max_workers && @priorities.length > workers.count(&:free)
-    end
-
-
-    def more_workers_than_needed?
-      workers.length > min_workers && @priorities.length < workers.count(&:free)
     end
 
 
@@ -157,11 +144,12 @@ module Futuroscope
         Futuroscope.info "POP:    ... thread #{Thread.current.__id__} woke up"
         Futuroscope.debug "        current priorities: #{@priorities.map { |k, v| ["future #{k}", v] }.to_h}"
         Futuroscope.debug "        current future workers: #{@priorities.map { |k, v| ["future #{k}", (thread = @futures[k].worker_thread; thread.nil? ? nil : "thread #{thread.__id__}")] }.to_h}"
-        unless timeout.nil? || @priorities.any? { |future_id, priority| @futures[future_id].worker_thread.nil? }
-          Futuroscope.info "        thread #{Thread.current.__id__} is dying because there's nothing to do"
+        if more_workers_than_needed? && !@priorities.any? { |future_id, priority| @futures[future_id].worker_thread.nil? }
+          Futuroscope.info "        thread #{Thread.current.__id__} is dying because there's nothing to do and there are more threads than the minimum"
           workers.delete_if { |worker| worker.thread == Thread.current }
           return nil
         end
+        timeout = nil
       end
       future_id = @priorities.select { |future_id, priority| @futures[future_id].worker_thread.nil? }.max_by { |future_id, priority| priority }.first
       Futuroscope.info "POP:    thread #{Thread.current.__id__} will start working on future #{future_id}"
@@ -212,6 +200,21 @@ module Futuroscope
         its_thread = @futures[future_id].worker_thread
         return its_thread if !its_thread.nil? && @dependencies[its_thread].worker_thread.nil?
       end
+    end
+
+
+    def need_extra_worker?
+      workers.count < max_workers && futures_needing_worker.count > workers.count(&:free)
+    end
+
+
+    def more_workers_than_needed?
+      workers.count > min_workers && futures_needing_worker.count < workers.count(&:free)
+    end
+
+
+    def futures_needing_worker
+      @futures.values.select { |future| future.worker_thread.nil? }
     end
 
   end
