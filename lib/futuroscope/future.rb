@@ -11,11 +11,7 @@ module Futuroscope
   class Future < ::Delegator
     extend ::Forwardable
 
-    attr_reader :worker_thread
-
-    def worker_thread=(thread)
-      @mutex.synchronize { @worker_thread = thread }
-    end
+    attr_accessor :worker_thread
 
     # Initializes a future with a block and starts its execution.
     #
