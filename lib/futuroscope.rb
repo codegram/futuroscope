@@ -1,10 +1,10 @@
-require "futuroscope/deadlock_error"
-require "futuroscope/future"
-require "futuroscope/map"
-require "futuroscope/pool"
-require "futuroscope/version"
-
 module Futuroscope
+  require_relative "futuroscope/deadlock_error"
+  require_relative "futuroscope/future"
+  require_relative "futuroscope/map"
+  require_relative "futuroscope/pool"
+  require_relative "futuroscope/version"
+
   # Gets the default futuroscope's pool.
   #
   # Returns a Pool
