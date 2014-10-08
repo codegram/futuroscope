@@ -95,17 +95,13 @@ module Futuroscope
     end
 
     def resolved_future
-      unless resolved?
-        @pool.depend self
-        wait_until_resolved
-      end
-      @resolved_future
-    end
-
-    def wait_until_resolved
       @mutex.synchronize do
-        @worker_finished.wait(@mutex) unless resolved?
+        unless resolved?
+          @pool.depend self
+          @worker_finished.wait(@mutex)
+        end
       end unless resolved?
+      @resolved_future
     end
   end
 end
