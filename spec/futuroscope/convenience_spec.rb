@@ -1,4 +1,3 @@
-require 'spec_helper'
 require 'futuroscope/convenience'
 require 'timeout'
 

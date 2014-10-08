@@ -8,8 +8,10 @@ module Futuroscope
   # the future. That is, will block when the result is not ready until it is,
   # and will return it instantly if the thread's execution already finished.
   #
-  class Future < Delegator
+  class Future < ::Delegator
     extend ::Forwardable
+
+    attr_accessor :worker_thread
 
     # Initializes a future with a block and starts its execution.
     #
@@ -27,21 +29,32 @@ module Futuroscope
     #
     # Returns a Future
     def initialize(pool = ::Futuroscope.default_pool, &block)
-      @queue = ::SizedQueue.new(1)
+      @worker_finished = ConditionVariable.new
       @pool = pool
       @block = block
-      @mutex = Mutex.new
-      @pool.queue self
+      @mutex = ::Mutex.new
+      @worker_thread = nil
+      @pool.push self
     end
 
     # Semipublic: Forces this future to be run.
-    def run_future
-      @queue.push(value: @block.call)
-    rescue ::Exception => e
-      @queue.push(exception: e)
+    def resolve!
+      @mutex.synchronize do
+        begin
+          Thread.handle_interrupt(DeadlockError => :immediate) do
+            @resolved_future = { value: @block.call }
+          end
+        rescue ::Exception => e
+          @resolved_future = { exception: e }
+        ensure
+          @pool.done_with self
+          @worker_thread = nil
+          @worker_finished.broadcast
+        end
+      end
     end
 
-    # Semipublic: Returns the future's value. Will wait for the future to be 
+    # Semipublic: Returns the future's value. Will wait for the future to be
     # completed or return its value otherwise. Can be called multiple times.
     #
     # Returns the Future's block execution result.
@@ -61,6 +74,10 @@ module Futuroscope
       @resolved_future = value
     end
 
+    def resolved?
+      instance_variable_defined? :@resolved_future
+    end
+
     def_delegators :__getobj__, :class, :kind_of?, :is_a?, :nil?
 
     alias_method :future_value, :__getobj__
@@ -68,16 +85,19 @@ module Futuroscope
     private
 
     def resolved_future_value_or_raise
-      resolved = resolved_future_value
-
-      Kernel.raise resolved[:exception] if resolved[:exception]
-      resolved
+      resolved_future.tap do |resolved|
+        ::Kernel.raise resolved[:exception] if resolved.has_key?(:exception)
+      end
     end
 
-    def resolved_future_value
-      @resolved_future || @mutex.synchronize do
-        @resolved_future ||= @queue.pop
-      end
+    def resolved_future
+      @mutex.synchronize do
+        unless resolved?
+          @pool.depend self
+          @worker_finished.wait(@mutex)
+        end
+      end unless resolved?
+      @resolved_future
     end
   end
 end
