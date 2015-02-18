@@ -1,4 +1,4 @@
-require 'futuroscope/future'
+require "futuroscope/future"
 
 module Futuroscope
   # A futuroscope map behaves like a regular map but performs all operations

@@ -1,4 +1,4 @@
-require 'futuroscope'
+require "futuroscope"
 
 module Kernel
   def future(pool = Futuroscope.default_pool, &block)
