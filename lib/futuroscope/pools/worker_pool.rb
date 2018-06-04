@@ -19,11 +19,11 @@ module Futuroscope
         @queue = Queue.new
         @workers = Set.new
         @mutex = Mutex.new
-        warm_up_workers
       end
 
       def queue(future)
         @mutex.synchronize do
+          spin_default_workers_on_demand_to_test_segfault
           spin_worker if can_spin_extra_workers?
 
           @queue.push future
@@ -61,10 +61,17 @@ module Futuroscope
 
       def warm_up_workers
         @mutex.synchronize do
-          while (@workers.length < @min_workers)
-            spin_worker
-          end
+          spin_default_workers_on_demand_to_test_segfault
         end
+      end
+
+      def spin_default_workers_on_demand_to_test_segfault
+        return if @already_span
+
+        while (@workers.length < @min_workers)
+          spin_worker
+        end
+        @already_span =true
       end
 
       def can_spin_extra_workers?

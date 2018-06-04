@@ -1,12 +1,12 @@
 module Futuroscope
   module Pools
     describe WorkerPool do
-      it "spins up a number of workers" do
+      it "no longer spins up a number of workers at initialization time" do
         pool = WorkerPool.new(2..4)
-        expect(pool.workers).to have(2).workers
+        expect(pool.workers).to have(0).workers
 
         pool = WorkerPool.new(3..4)
-        expect(pool.workers).to have(3).workers
+        expect(pool.workers).to have(0).workers
       end
 
       describe "queue" do
