@@ -1,11 +1,11 @@
 # Futuroscope
-[![Gem Version](https://badge.fury.io/rb/futuroscope.png)](http://badge.fury.io/rb/futuroscope)
-[![Build Status](https://travis-ci.org/codegram/futuroscope.png?branch=master)](https://travis-ci.org/codegram/futuroscope)
-[![Code Climate](https://codeclimate.com/github/codegram/futuroscope.png)](https://codeclimate.com/github/codegram/futuroscope)
-[![Coverage Status](https://coveralls.io/repos/codegram/futuroscope/badge.png?branch=master)](https://coveralls.io/r/codegram/futuroscope)
-[![Dependency Status](https://gemnasium.com/codegram/futuroscope.png)](https://gemnasium.com/codegram/futuroscope)
+[![Gem Version](https://badge.fury.io/rb/futuroscope.svg)](http://badge.fury.io/rb/futuroscope)
+[![Build Status](https://travis-ci.org/codegram/futuroscope.svg?branch=master)](https://travis-ci.org/codegram/futuroscope)
+[![Code Climate](https://codeclimate.com/github/codegram/futuroscope.svg)](https://codeclimate.com/github/codegram/futuroscope)
+[![Coverage Status](https://coveralls.io/repos/codegram/futuroscope/badge.svg?branch=master)](https://coveralls.io/r/codegram/futuroscope)
+[![Dependency Status](https://gemnasium.com/codegram/futuroscope.svg)](https://gemnasium.com/codegram/futuroscope)
 
-**Join a live discussion on Gitter**: [![Gitter chat](https://badges.gitter.im/codegram/futuroscope.png)](https://gitter.im/codegram/futuroscope)
+**Join a live discussion on Gitter**: [![Gitter chat](https://badges.gitter.im/codegram/futuroscope.svg)](https://gitter.im/codegram/futuroscope)
 
 Futursocope is a simple library that implements futures in ruby. Futures are a
 concurrency pattern meant to help you deal with threads in a simple, transparent way.
